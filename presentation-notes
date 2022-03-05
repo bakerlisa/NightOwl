@@ -1,0 +1,36 @@
+======= GOALS: ======
+Book Club social media app:
+
+Big Goals:
+    - keep track of memebers
+    - keep track and look up books that your group has read
+    - easy place to visaulize location for the club meetings
+
+1. login
+2. Joining a group 
+3. mssaging
+
+
+
+
+VISION:
+1. build out the messageing app 
+    -send a email to the devlopers account when a book is added
+    -send out banner messages on the top of the screen
+2. Build out the group pages
+    -list all the group deatils: books, people in group, pull in goolge maps ect.
+3. search functions on the site
+4. pagination
+
+
+LEARNED:
+1. more about tables: more practive with larger SQL queries and larger databases
+2. Split my code into header inmoprts, macors, and blocks to keep my code dry
+3. API - did look into it to implament on the site
+4. 
+
+
+
+
+
+
