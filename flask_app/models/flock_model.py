@@ -4,6 +4,7 @@ from flask import flash
 
 from flask_app.models import flock_user_model
 from flask_app.models import user_model
+from flask_app.models import host_model
 
 class Flock:
     def __init__(self,data):
@@ -143,6 +144,47 @@ class Flock:
             flock_information.append(one_flock)
         return flock_information
 
+# =============================================
+# SELECT : all flock memebers who aren't the admin 
+# =============================================
+    @classmethod
+    def get_flock_admin_info(cls,data):
+        query =  "SELECT * FROM flocks LEFT JOIN flocks_users ON flocks_users.flock_id = flocks.id LEFT JOIN users ON users.id = flocks_users.user_id WHERE flocks_users.flock_id =  %(id)s AND flocks_users.status = 'admin';"
+        
+        results = connectToMySQL('book_club').query_db(query,data)
+        
+        flock_information = []
+
+        for row in results:
+            one_flock = cls(row)
+
+            one_flock_user = {
+                "id": row['id'],
+                "user_id": row['user_id'],
+                "flock_id": row['flock_id'],
+                "status": row['status'],
+                "created_at": row['created_at'],
+                "updated_at": row['updated_at']
+            }
+            one_flock.status = flock_user_model.Flock_User(one_flock_user)
+
+            one_user = {
+                "id" : row['id'],
+                "first_name" : row['first_name'],
+                "last_name" : row['last_name'],
+                "phone" : row['phone'],
+                "email" : row['email'],
+                "phone" : row['phone'],
+                "password" : row['password'],
+                "profile_image" : row['profile_image'],
+                "created_at" : row['created_at'],
+                "updated_at" : row['updated_at']
+            }
+            one_flock.member = user_model.User(one_user)
+
+            flock_information.append(one_flock)
+        return flock_information
+
 # ============================================= 
 # SELECT : one flock 
 # ============================================= 
@@ -151,7 +193,6 @@ class Flock:
         query = "SELECT * FROM flocks WHERE id = %(flock_id)s;"
         results = connectToMySQL('book_club').query_db(query,data)
         return results
-
 
 # =============================================  
 # SELECT: check if group name is unique
@@ -203,12 +244,12 @@ class Flock:
 # =============================================
     @classmethod
     def remove_old_admin(cls,data):
-        query = "UPDATE FROM flocks_users SET status = 'user'  WHERE  user_id = %(old_admin_id)s AND flock_id = %(flock_id)s;"
+        query = "UPDATE flocks_users SET status = 'user'  WHERE  user_id = %(old_admin_id)s AND flock_id = %(flock_id)s;"
         results = connectToMySQL('book_club').query_db(query,data)
         return results 
 
     @classmethod
     def make_new_admin(cls,data):
-        query = "UPDATE FROM flocks_users SET status = 'admin' WHERE  user_id = %(user_id)s AND flock_id = %(flock_id)s;"
+        query = "UPDATE flocks_users SET status = %(type)s WHERE  user_id = %(user_id)s AND flock_id = %(flock_id)s;"
         results = connectToMySQL('book_club').query_db(query,data)
         return results 

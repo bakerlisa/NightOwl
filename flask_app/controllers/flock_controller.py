@@ -2,6 +2,7 @@ from flask_app import app
 from flask import render_template,redirect,request,session,flash
 from flask_app.models.flock_model import Flock
 from flask_app.models.user_model import User
+from flask_app.models.host_model import Host
 
 
 # =============================================  
@@ -47,9 +48,9 @@ def new_flock_made():
 @app.route('/flock_settings/<int:flock_id>')
 def flock_settings(flock_id):
     data = { "id" : flock_id }
-    flock_info = Flock.get_admin_info(data)
-    all_memebers = User.get_all_users_in_flock(data)
-    return render_template('flock_settings.html',flock_info = flock_info,all_memebers=all_memebers)
+    flock_info = Flock.get_flock_admin_info(data)
+    all_memebers = User.all_flock_users(data)
+    return render_template('flock_settings.html', all_memebers=all_memebers,flock_info=flock_info)
 
 # =============================================  
 # CREATE: a group
@@ -89,7 +90,8 @@ def set_new_admin():
     data = {
         "user_id":request.form['new_admin_id'],
         "old_admin_id":request.form['old_admin_id'],
-        "flock_id":request.form['flock_id']
+        "flock_id":request.form['flock_id'],
+        "type" : "admin"
     }
     if not Flock.validate_new_admin(request.form):
         return redirect(f"flock_settings/{data.flock_id}")
@@ -103,8 +105,21 @@ def new_admin():
     flash("You are no longer admin! Thanks for all you did","info")
     return redirect('/dashboard')
 
-
-
+# =============================================  
+# UPDATE : set new host(s)
+# ============================================= 
+@app.route('/set_host',methods=["POST"]) 
+def set_host():
+    data = {
+        "user_id" : request.form["new_host_id"],
+        "flock_id" : request.form["flock_id"],
+        "event_date" : request.form["event_date"]
+    }
+    if not Host.validate_host(request.form):
+        return redirect(f"flock_settings/{request.form['flock_id']}")
+    else:
+        Host.make_new_host(data)
+        return redirect(f"/flocks_dashboard/{request.form['flock_id']}")
 # =============================================  
 # DELETE : leave group
 # =============================================  

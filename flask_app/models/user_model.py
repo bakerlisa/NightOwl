@@ -4,7 +4,6 @@ import re
 from flask import flash 
 
 from flask_app.models import flock_model
-from flask_app.models import address_model
 from flask_app.models import flock_user_model
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+[a-zA-Z]+$')
@@ -202,14 +201,39 @@ class User:
 # ========================================
 # SELECT all users in flock
 # ========================================
-    # @classmethod
-    # def get_all_members(cls,data):
-    #     query =  "SELECT * FROM users LEFT JOIN flocks_users ON flocks_users.user_id = users.id LEFT JOIN flocks ON flocks.id = flocks_users.flock_id WHERE flock_id = 10 AND flocks_users.status != 'admin'"
-    #     results = connectToMySQL('book_club').query_db(query,data)
+    @classmethod
+    def all_flock_users(cls,data):
+        query = "SELECT * FROM users  LEFT JOIN  flocks_users ON flocks_users.user_id = users.id  LEFT JOIN flocks ON flocks.id = flocks_users.flock_id  WHERE flocks_users.status != 'admin' AND flocks.id = %(id)s;"
+        results = connectToMySQL('book_club').query_db(query,data)
 
+        all_flock_info = []
 
-        
-    #     return results
+        for row in results:
+            one_user = cls(row)
+
+            one_flock_user = {
+                "id" : row['flocks_users.id'],
+                "user_id" : row['user_id'],
+                "flock_id" : row['flock_id'],
+                "status" : row['status'],
+                "created_at" : row['flocks_users.created_at'],
+                "updated_at" : row['flocks_users.updated_at']
+            }
+            one_user.flur = flock_user_model.Flock_User(one_flock_user)
+
+            one_flock = {
+                "id" : row['id'],
+                "title" : row['title'],
+                "city" : row['city'],
+                "state" : row['state'],
+                "privacy_setting" : row['privacy_setting'],
+                "created_at" : row['created_at'],
+                "updated_at" : row['updated_at']
+            }
+            one_user.flock = flock_model.Flock(one_flock)
+
+            all_flock_info.append(one_user)
+        return all_flock_info
 
 # ========================================
 # CREATE: new user

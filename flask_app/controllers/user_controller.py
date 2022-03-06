@@ -8,6 +8,7 @@ from flask_app.models.address_model import Address
 from flask_app.models.message_model import Message
 from flask_app.models.flock_model import Flock
 from flask_app.models.flock_user_model import Flock_User
+from flask_app.models.host_model import Host
 
 
 from flask_bcrypt import Bcrypt
@@ -49,8 +50,9 @@ def render_dashboard():
             user_info = User.get_user_info(data)
             all_flocks = Flock.select_all_flocks(data)
             flock_info = Flock.get_admin_info(data)
+            host_info = Host.get_host_info(data)
             # all_messages = Message.get_all_for_message(data)
-            return render_template('dashboard.html',user_info=user_info,all_flocks=all_flocks,flock_info=flock_info)
+            return render_template('dashboard.html',user_info=user_info,all_flocks=all_flocks,flock_info=flock_info,host_info=host_info)
         else:
             flash("Please Loin","info")
             return redirect('/')
