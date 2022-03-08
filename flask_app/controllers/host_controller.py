@@ -8,6 +8,9 @@ from flask_app.models.host_model import Host
 # === 1. Remeber to import file on server.py 
 # === Note: Controllers pull in classes
 
+
+
+
 @app.route('/host_settings')
 def host_settings():
     #set this info
